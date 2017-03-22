@@ -35,6 +35,8 @@ public enum RedisClientError: Error {
 public protocol RedisClient {
 
     func execute(_ command: String, arguments: [String]?) throws -> RedisClientResponse
+
+    func multi(_ commands: (RedisClient, RedisClientTransaction) throws -> Void) throws -> [RedisClientResponse]
 }
 
 // MARK: - Convenience Methods

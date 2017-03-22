@@ -379,7 +379,7 @@ class RedisClientTests: XCTestCase {
         client.execute = { command, arguments in
             XCTAssertEqual(command, "SETEX")
             XCTAssertEqual(arguments?[0], "test")
-            XCTAssertEqual(arguments?[1], "60.0")
+            XCTAssertEqual(arguments?[1], "60")
             XCTAssertEqual(arguments?[2], "a")
             expectation.fulfill()
 
@@ -400,7 +400,7 @@ class RedisClientTests: XCTestCase {
         client.execute = { command, arguments in
             XCTAssertEqual(command, "SETEX")
             XCTAssertEqual(arguments?[0], "test")
-            XCTAssertEqual(arguments?[1], "60.0")
+            XCTAssertEqual(arguments?[1], "60")
             XCTAssertEqual(arguments?[2], "a")
             expectation.fulfill()
 

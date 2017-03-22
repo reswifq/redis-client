@@ -33,7 +33,7 @@ import Pool
 
  - Attention: Sharing a Redis connection between multiple threads must be avoided, and it's not supported in any way. A `RedisClientPool` must be use instead.
  */
-public final class RedisClientPool: Pool<RedisClient> {
+public final class RedisClientPool: Pool<RedisClient>, RedisClient {
 
     public func execute(_ command: String, arguments: [String]? = nil) throws -> RedisClientResponse {
 

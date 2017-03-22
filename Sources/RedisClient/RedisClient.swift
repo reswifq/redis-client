@@ -128,9 +128,9 @@ public extension RedisClient {
     }
 
     @discardableResult
-    public func brpoplpush(source: String, destination: String) throws -> String {
+    public func brpoplpush(source: String, destination: String, count: Int = 0) throws -> String {
 
-        let response = try self.execute("BRPOPLPUSH", arguments: [source, destination])
+        let response = try self.execute("BRPOPLPUSH", arguments: [source, destination, String(count)])
 
         guard let result = response.string else {
             throw RedisClientError.invalidResponse(response)

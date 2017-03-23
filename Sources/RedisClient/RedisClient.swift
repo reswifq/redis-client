@@ -239,6 +239,26 @@ public extension RedisClient {
     }
 
     @discardableResult
+    public func zrangebyscore(_ key: String, min: Double, max: Double, includeMin: Bool = false, includeMax: Bool = true) throws -> [String] {
+
+        var arguments = [key]
+
+        let minArg = includeMin ? String(min) : "(\(min)"
+        let maxArg = includeMax ? String(max) : "(\(max)"
+
+        arguments.append(String(minArg))
+        arguments.append(String(maxArg))
+
+        let response = try self.execute("ZRANGEBYSCORE", arguments: arguments)
+
+        guard let result = response.array else {
+            throw RedisClientError.invalidResponse(response)
+        }
+
+        return result.flatMap { $0.string }
+    }
+
+    @discardableResult
     public func zrem(_ key: String, member: String) throws -> Int64 {
 
         let response = try self.execute("ZREM", arguments: [key, member])

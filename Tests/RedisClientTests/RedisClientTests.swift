@@ -52,6 +52,8 @@ class RedisClientTests: XCTestCase {
         ("testZADDError", testZADDError),
         ("testZRANGE", testZRANGE),
         ("testZRANGEError", testZRANGEError),
+        ("testZRANGEBYSCORE", testZRANGEBYSCORE),
+        ("testZRANGEBYSCOREError", testZRANGEBYSCOREError),
         ("testZREM", testZREM),
         ("testZREMError", testZREMError),
         ("testEnqueueTransaction", testEnqueueTransaction),
@@ -643,6 +645,52 @@ class RedisClientTests: XCTestCase {
         }
 
         XCTAssertThrowsError(try client.zrange("test", start: 0, stop: -1), "zrange") { error in
+            XCTAssertTrue(error is RedisClientError)
+        }
+        
+        self.waitForExpectations(timeout: 4.0, handler: nil)
+    }
+
+    func testZRANGEBYSCORE() throws {
+
+        let client = MockClient()
+
+        let expectation = self.expectation(description: "execute")
+
+        client.execute = { command, arguments in
+            XCTAssertEqual(command, "ZRANGEBYSCORE")
+            XCTAssertEqual(arguments?[0], "test")
+            XCTAssertEqual(arguments?[1], "0.0")
+            XCTAssertEqual(arguments?[2], "10.0")
+            expectation.fulfill()
+
+            return RedisClientResponse.array([.string("one"), .string("two")])
+        }
+
+        let value = try client.zrangebyscore("test", min: 0.0, max: 10.0, includeMin: true, includeMax: true)
+
+        self.waitForExpectations(timeout: 4.0, handler: nil)
+
+        XCTAssertEqual(value, ["one", "two"])
+    }
+
+    func testZRANGEBYSCOREError() throws {
+
+        let client = MockClient()
+
+        let expectation = self.expectation(description: "execute")
+
+        client.execute = { command, arguments in
+            XCTAssertEqual(command, "ZRANGEBYSCORE")
+            XCTAssertEqual(arguments?[0], "test")
+            XCTAssertEqual(arguments?[1], "(0.0")
+            XCTAssertEqual(arguments?[2], "(10.0")
+            expectation.fulfill()
+
+            return RedisClientResponse.error("error")
+        }
+
+        XCTAssertThrowsError(try client.zrangebyscore("test", min: 0.0, max: 10.0, includeMin: false, includeMax: false), "zrangebyscore") { error in
             XCTAssertTrue(error is RedisClientError)
         }
         

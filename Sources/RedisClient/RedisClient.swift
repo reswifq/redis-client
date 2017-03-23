@@ -36,6 +36,7 @@ public protocol RedisClient {
 
     func execute(_ command: String, arguments: [String]?) throws -> RedisClientResponse
 
+    @discardableResult
     func multi(_ commands: (RedisClient, RedisClientTransaction) throws -> Void) throws -> [RedisClientResponse]
 }
 

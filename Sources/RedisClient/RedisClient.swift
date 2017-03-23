@@ -115,6 +115,26 @@ public extension RedisClient {
     }
 
     @discardableResult
+    public func rpush(_ key: String, values: String...) throws -> Int64 {
+        return try self.rpush(key, values: values)
+    }
+
+    @discardableResult
+    public func rpush(_ key: String, values: [String]) throws -> Int64 {
+
+        var arguments = [key]
+        arguments.append(contentsOf: values)
+
+        let response = try self.execute("RPUSH", arguments: arguments)
+
+        guard let result = response.integer else {
+            throw RedisClientError.invalidResponse(response)
+        }
+
+        return result
+    }
+
+    @discardableResult
     public func rpoplpush(source: String, destination: String) throws -> String? {
 
         let response = try self.execute("RPOPLPUSH", arguments: [source, destination])
@@ -197,6 +217,30 @@ public extension RedisClient {
         }
 
         let response = try self.execute("ZADD", arguments: arguments)
+
+        guard let result = response.integer else {
+            throw RedisClientError.invalidResponse(response)
+        }
+
+        return result
+    }
+
+    @discardableResult
+    public func zrange(_ key: String, start: Int, stop: Int) throws -> [String] {
+
+        let response = try self.execute("ZRANGE", arguments: [key, String(start), String(stop)])
+
+        guard let result = response.array else {
+            throw RedisClientError.invalidResponse(response)
+        }
+
+        return result.flatMap { $0.string }
+    }
+
+    @discardableResult
+    public func zrem(_ key: String, member: String) throws -> Int64 {
+
+        let response = try self.execute("ZREM", arguments: [key, member])
 
         guard let result = response.integer else {
             throw RedisClientError.invalidResponse(response)

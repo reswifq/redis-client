@@ -35,6 +35,8 @@ class RedisClientTests: XCTestCase {
         ("testDELError", testDELError),
         ("testLPUSH", testLPUSH),
         ("testLPUSHError", testLPUSHError),
+        ("testRPUSH", testRPUSH),
+        ("testRPUSHError", testRPUSHError),
         ("testRPOPLPUSH", testRPOPLPUSH),
         ("testRPOPLPUSHWithEmptyList", testRPOPLPUSHWithEmptyList),
         ("testRPOPLPUSHError", testRPOPLPUSHError),
@@ -48,6 +50,10 @@ class RedisClientTests: XCTestCase {
         ("testLRANGEError", testLRANGEError),
         ("testZADD", testZADD),
         ("testZADDError", testZADDError),
+        ("testZRANGE", testZRANGE),
+        ("testZRANGEError", testZRANGEError),
+        ("testZREM", testZREM),
+        ("testZREMError", testZREMError),
         ("testEnqueueTransaction", testEnqueueTransaction),
         ("testMULTI", testMULTI),
         ("testMULTIError", testMULTIError),
@@ -257,6 +263,49 @@ class RedisClientTests: XCTestCase {
             XCTAssertTrue(error is RedisClientError)
         }
 
+        self.waitForExpectations(timeout: 4.0, handler: nil)
+    }
+
+    func testRPUSH() throws {
+
+        let client = MockClient()
+
+        let expectation = self.expectation(description: "execute")
+
+        client.execute = { command, arguments in
+            XCTAssertEqual(command, "RPUSH")
+            XCTAssertEqual(arguments?[0], "test")
+            XCTAssertEqual(arguments?[1], "a")
+            XCTAssertEqual(arguments?[2], "b")
+            XCTAssertEqual(arguments?[3], "c")
+            expectation.fulfill()
+
+            return RedisClientResponse.integer(3)
+        }
+
+        let count = try client.rpush("test", values: "a", "b", "c")
+
+        self.waitForExpectations(timeout: 4.0, handler: nil)
+
+        XCTAssertEqual(count, 3)
+    }
+
+    func testRPUSHError() throws {
+
+        let client = MockClient()
+
+        let expectation = self.expectation(description: "execute")
+
+        client.execute = { command, arguments in
+            expectation.fulfill()
+
+            return RedisClientResponse.null
+        }
+
+        XCTAssertThrowsError(try client.rpush("test", values: "a", "b", "c"), "rpush") { error in
+            XCTAssertTrue(error is RedisClientError)
+        }
+        
         self.waitForExpectations(timeout: 4.0, handler: nil)
     }
 
@@ -551,6 +600,96 @@ class RedisClientTests: XCTestCase {
             XCTAssertTrue(error is RedisClientError)
         }
 
+        self.waitForExpectations(timeout: 4.0, handler: nil)
+    }
+
+    func testZRANGE() throws {
+
+        let client = MockClient()
+
+        let expectation = self.expectation(description: "execute")
+
+        client.execute = { command, arguments in
+            XCTAssertEqual(command, "ZRANGE")
+            XCTAssertEqual(arguments?[0], "test")
+            XCTAssertEqual(arguments?[1], "0")
+            XCTAssertEqual(arguments?[2], "-1")
+            expectation.fulfill()
+
+            return RedisClientResponse.array([.string("one"), .string("two")])
+        }
+
+        let value = try client.zrange("test", start: 0, stop: -1)
+
+        self.waitForExpectations(timeout: 4.0, handler: nil)
+
+        XCTAssertEqual(value, ["one", "two"])
+    }
+
+    func testZRANGEError() throws {
+
+        let client = MockClient()
+
+        let expectation = self.expectation(description: "execute")
+
+        client.execute = { command, arguments in
+            XCTAssertEqual(command, "ZRANGE")
+            XCTAssertEqual(arguments?[0], "test")
+            XCTAssertEqual(arguments?[1], "0")
+            XCTAssertEqual(arguments?[2], "-1")
+            expectation.fulfill()
+
+            return RedisClientResponse.error("error")
+        }
+
+        XCTAssertThrowsError(try client.zrange("test", start: 0, stop: -1), "zrange") { error in
+            XCTAssertTrue(error is RedisClientError)
+        }
+        
+        self.waitForExpectations(timeout: 4.0, handler: nil)
+    }
+
+    func testZREM() throws {
+
+        let client = MockClient()
+
+        let expectation = self.expectation(description: "execute")
+
+        client.execute = { command, arguments in
+            XCTAssertEqual(command, "ZREM")
+            XCTAssertEqual(arguments?[0], "test")
+            XCTAssertEqual(arguments?[1], "a")
+            expectation.fulfill()
+
+            return RedisClientResponse.integer(1)
+        }
+
+        let value = try client.zrem("test", member: "a")
+
+        self.waitForExpectations(timeout: 4.0, handler: nil)
+
+        XCTAssertEqual(value, 1)
+    }
+
+    func testZREMError() throws {
+
+        let client = MockClient()
+
+        let expectation = self.expectation(description: "execute")
+
+        client.execute = { command, arguments in
+            XCTAssertEqual(command, "ZREM")
+            XCTAssertEqual(arguments?[0], "test")
+            XCTAssertEqual(arguments?[1], "a")
+            expectation.fulfill()
+
+            return RedisClientResponse.error("error")
+        }
+
+        XCTAssertThrowsError(try client.zrem("test", member: "a"), "zrem") { error in
+            XCTAssertTrue(error is RedisClientError)
+        }
+        
         self.waitForExpectations(timeout: 4.0, handler: nil)
     }
 

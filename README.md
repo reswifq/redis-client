@@ -1,6 +1,6 @@
 # RedisClient
 
-![Swift](https://img.shields.io/badge/swift-3.0.2-brightgreen.svg)
+![Swift](https://img.shields.io/badge/swift-3.1-brightgreen.svg)
 [![Build Status](https://api.travis-ci.org/reswifq/redis-client.svg?branch=master)](https://travis-ci.org/reswifq/redis-client)
 [![Code Coverage](https://codecov.io/gh/reswifq/redis-client/branch/master/graph/badge.svg)](https://codecov.io/gh/reswifq/redis-client)
 

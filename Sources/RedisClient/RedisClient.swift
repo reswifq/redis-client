@@ -162,7 +162,6 @@ public extension RedisClient {
         return result
     }
 
-    @discardableResult
     public func setex(_ key: String, timeout: TimeInterval, value: String) throws {
 
         let response = try self.execute("SETEX", arguments: [key, String(Int(timeout)), value])

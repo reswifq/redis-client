@@ -1,3 +1,5 @@
+// swift-tools-version:4.0
+
 //
 //  Package.swift
 //  RedisClient
@@ -23,10 +25,14 @@ import PackageDescription
 
 let package = Package(
 	name: "RedisClient",
-	targets: [
-		Target(name: "RedisClient")
+	products: [
+		.library(name: "RedisClient", targets: ["RedisClient"])
 	],
 	dependencies: [
-		.Package(url: "https://github.com/reswifq/pool.git", majorVersion: 1)
+		.package(url: "https://github.com/reswifq/pool.git", .upToNextMajor(from: "1.2.0"))
+	],
+	targets: [
+		.target(name: "RedisClient", dependencies: ["Pool"]),
+		.testTarget(name: "RedisClientTests", dependencies: ["RedisClient"])
 	]
 )

@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Pool",
+        "repositoryURL": "https://github.com/reswifq/pool.git",
+        "state": {
+          "branch": null,
+          "revision": "b0987c386069829b2cb1e43fa802321979ef07f2",
+          "version": "1.2.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
